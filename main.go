@@ -16,9 +16,6 @@ func main() {
 	ChanFloat := make(chan string, 10)
 
 	var wg sync.WaitGroup
-	var wg2 sync.WaitGroup
-	var wg3 sync.WaitGroup
-	var writeWG sync.WaitGroup 
 
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
@@ -26,29 +23,26 @@ func main() {
 	}
 
 	for i := 0; i < 5; i++ {
-		wg2.Add(1)
-		go GenerateInt(&wg2, ChanInt)
+		wg.Add(1)
+		go GenerateInt(&wg, ChanInt)
 	}
 
 	for i := 0; i < 5; i++ {
-		wg3.Add(1)
-		go GenerateIntFloat(&wg3, ChanFloat)
+		wg.Add(1)
+		go GenerateIntFloat(&wg, ChanFloat)
 	}
 
 
-	writeWG.Add(3) 
-	go WriteString(ChanString, &writeWG)
-	go WriteInt(ChanInt, &writeWG)
-	go WriteFloat(ChanFloat, &writeWG)
+	wg.Add(3) 
+	go WriteString(ChanString, &wg)
+	go WriteInt(ChanInt, &wg)
+	go WriteFloat(ChanFloat, &wg)
 
-	wg.Wait()
+	
 	close(ChanString)
-	wg2.Wait()
 	close(ChanInt)
-	wg3.Wait()
 	close(ChanFloat)
-
-	writeWG.Wait() 
+	wg.Wait()
 	fmt.Println("aboba")
 }
 
